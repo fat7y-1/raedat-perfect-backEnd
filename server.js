@@ -10,6 +10,8 @@ dns.setServers(["8.8.8.8", "1.1.1.1"])
 const db = require("./db")
 
 // Routers here
+const authRouter = require("./routes/authRouter")
+const contentRouter = require("./routes/contentRouter")
 
 const app = express()
 app.use(cors())
@@ -22,6 +24,8 @@ app.use(express.urlencoded({ extended: false }))
 // })
 
 //  use Router here
+app.use("/auth", authRouter)
+app.use("/content", contentRouter)
 
 app.listen(PORT, () => {
   console.log(`Running Express server on Port ${PORT} . . .`)
