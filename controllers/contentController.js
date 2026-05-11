@@ -20,20 +20,15 @@ const getAllContent = async (req, res) => {
 
 const addContent = async (req, res) => {
   try {
-    const contentInDB = await Content.exists({ name: req.body.name })
-    if (contentInDB) {
-      return res.send("This menu item already exists!")
-    } else {
-      const newContent = await Content.create({
-        page: req.body.page,
-        header: req.body.header,
-        text: req.body.text,
-        image: req.body.image,
-      })
-      res.send(newContent)
-    }
+    const newContent = await Content.create({
+      page: req.body.page,
+      header: req.body.header,
+      text: req.body.text,
+      image: req.body.image,
+    })
+    res.status(201).send(newContent)
   } catch (error) {
-    res.send(`error: ${error}`)
+    res.status(500).send(`error: ${error}`)
   }
 }
 
@@ -72,10 +67,12 @@ const getOneContent = async (req, res) => {
 
 const deleteContent = async (req, res) => {
   try {
-    const deletedContent = await Content.findByIdAndDelete({
-      _id: req.params.id,
-    })
-    res.send(`deletedContent: ${deletedContent}`)
+    const deletedContent = await Content.findByIdAndDelete(req.params.id)
+    if (!deletedContent) {
+      return res.status(404).send({ message: "Content not found" })
+    }
+
+    res.send({ message: "Deleted successfully", id: req.params.id })
   } catch (error) {
     res.send(`Error: ${error}`)
   }
