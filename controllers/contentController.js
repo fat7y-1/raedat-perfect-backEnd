@@ -25,6 +25,8 @@ const addContent = async (req, res) => {
       header: req.body.header,
       text: req.body.text,
       image: req.body.image,
+      layoutType: req.body.layoutType,
+      items: req.body.items,
     })
     res.status(201).send(newContent)
   } catch (error) {
