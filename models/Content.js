@@ -5,6 +5,18 @@ const ContentSchema = new mongoose.Schema(
     header: { type: String },
     text: { type: String },
     image: { type: String },
+    layoutType: {
+      type: String,
+      default: "standard",
+      enum: ["standard", "grid-text", "grid-header"],
+    },
+    items: [
+      {
+        image: String,
+        title: String,
+        desc: String,
+      },
+    ],
   },
   { timestamps: true }
 )
