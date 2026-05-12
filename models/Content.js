@@ -10,6 +10,13 @@ const ContentSchema = new mongoose.Schema(
       default: "standard",
       enum: ["standard", "grid-text", "grid-header"],
     },
+    buttonText: { type: String },
+    buttonLink: { type: String },
+    textColor: { type: String },
+    fontFamily: { type: String },
+    imageStyle: { type: String },
+    imageSize: { type: String, default: "medium" },
+
     items: [
       {
         image: String,
