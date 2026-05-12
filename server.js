@@ -7,26 +7,32 @@ const PORT = process.env.PORT || 3000
 const dns = require("dns")
 dns.setServers(["8.8.8.8", "1.1.1.1"])
 
-const db = require("./db")
+// DB connection
+require("./db")
 
-// Routers here
+// Routers
 const authRouter = require("./routes/authRouter")
 const contentRouter = require("./routes/contentRouter")
+const contactRouter = require("./routes/contactRouter")
 
 const app = express()
+
+// Middlewares
 app.use(cors())
 app.use(logger("dev"))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-// app.use("/", (req, res) => {
-//   res.send(`Connected!`)
-// })
-
-//  use Router here
+// Routes
 app.use("/auth", authRouter)
 app.use("/content", contentRouter)
+app.use("/contact", contactRouter)
+// Test route (اختياري)
+app.get("/", (req, res) => {
+  res.send("Server is running...")
+})
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Running Express server on Port ${PORT} . . .`)
+  console.log(`Running Express server on Port ${PORT}...`)
 })
