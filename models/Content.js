@@ -5,6 +5,10 @@ const ContentSchema = new mongoose.Schema(
     header: { type: String },
     text: { type: String },
     image: { type: String },
+
+    headerAr: { type: String },
+    textAr: { type: String },
+    buttonTextAr: { type: String },
     layoutType: {
       type: String,
       default: "standard",
@@ -24,6 +28,7 @@ const ContentSchema = new mongoose.Schema(
         desc: String,
       },
     ],
+    position: { type: Number, default: 0 },
   },
   { timestamps: true }
 )
