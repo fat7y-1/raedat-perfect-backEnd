@@ -1,5 +1,6 @@
 const User = require("../models/User")
 const middleware = require("../middleware")
+const mongoose = require('mongoose')
 
 const registerUser = async (req, res) => {
   try {
@@ -57,25 +58,29 @@ const signIn = async (req, res) => {
         email: user.email,
         admin: user.admin,
       }
+
       let token = middleware.createToken(payload)
+
+     
       let userData = {
         username: user.username,
         email: user.email,
         id: user._id,
         admin: user.admin,
       }
+
       return res.send({ user: userData, token })
     } else {
       res
         .status(401)
         .send({ status: "Error", msg: "Invalid Email or Password" })
     }
-    // console.log("signed in!")
   } catch (error) {
     console.log(error)
-    res.status(401).send({ status: "Error", msg: "An error has occurred!" })
+    res.status(500).send({ status: "Error", msg: "An error has occurred!" })
   }
 }
+
 const checkSession = async (req, res) => {
   const { payload } = res.locals
   res.status(200).send(payload)
@@ -90,9 +95,53 @@ const getUserById = async (req, res) => {
     res.send(`error: ${error}`)
   }
 }
+
+
+
+
+
+const updatePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+
+    if (!id || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid or missing User ID.");
+    }
+
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+
+    let matched = await middleware.comparePassword(
+      oldPassword,
+      user.password
+    );
+
+    if (matched) {
+
+      let hashedPassword = await middleware.hashPassword(newPassword);
+      await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+      return res.status(200).send("Password updated successfully!");
+    } else {
+      return res.status(401).send("Old password does not match our records.");
+    }
+
+  } catch (error) {
+    console.error("Internal Error:", error);
+    res.status(500).send("Server Error: " + error.message);
+  }
+}
+
 module.exports = {
   registerUser,
   signIn,
   checkSession,
   getUserById,
+  updatePassword
 }
