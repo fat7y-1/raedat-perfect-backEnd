@@ -20,4 +20,11 @@ router.get(
 )
 router.get("/:id", authController.getUserById)
 
+router.post(
+  "/create-admin",
+  middleware.stripToken,
+  middleware.verifyToken,
+  authController.createAdmin
+)
+
 module.exports = router

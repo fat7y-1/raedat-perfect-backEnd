@@ -1,6 +1,6 @@
 const User = require("../models/User")
 const middleware = require("../middleware")
-const mongoose = require('mongoose')
+const mongoose = require("mongoose")
 
 const registerUser = async (req, res) => {
   try {
@@ -61,7 +61,6 @@ const signIn = async (req, res) => {
 
       let token = middleware.createToken(payload)
 
-     
       let userData = {
         username: user.username,
         email: user.email,
@@ -96,45 +95,68 @@ const getUserById = async (req, res) => {
   }
 }
 
-
-
-
-
 const updatePassword = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { oldPassword, newPassword } = req.body;
-
+    const { id } = req.params
+    const { oldPassword, newPassword } = req.body
 
     if (!id || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send("Invalid or missing User ID.");
+      return res.status(400).send("Invalid or missing User ID.")
     }
 
-
-    const user = await User.findById(id);
+    const user = await User.findById(id)
     if (!user) {
-      return res.status(404).send("User not found.");
+      return res.status(404).send("User not found.")
     }
 
-
-    let matched = await middleware.comparePassword(
-      oldPassword,
-      user.password
-    );
+    let matched = await middleware.comparePassword(oldPassword, user.password)
 
     if (matched) {
+      let hashedPassword = await middleware.hashPassword(newPassword)
+      await User.findByIdAndUpdate(id, { password: hashedPassword })
 
-      let hashedPassword = await middleware.hashPassword(newPassword);
-      await User.findByIdAndUpdate(id, { password: hashedPassword });
-
-      return res.status(200).send("Password updated successfully!");
+      return res.status(200).send("Password updated successfully!")
     } else {
-      return res.status(401).send("Old password does not match our records.");
+      return res.status(401).send("Old password does not match our records.")
+    }
+  } catch (error) {
+    console.error("Internal Error:", error)
+    res.status(500).send("Server Error: " + error.message)
+  }
+}
+
+const createAdmin = async (req, res) => {
+  try {
+    const userInDB = await User.findOne({
+      email: req.body.email,
+    })
+
+    if (userInDB) {
+      return res.status(400).send({
+        message: "Email already exists",
+      })
     }
 
+    const hashedPassword = await middleware.hashPassword(req.body.password)
+
+    const newAdmin = await User.create({
+      username: req.body.name,
+      email: req.body.email,
+      password: hashedPassword,
+      admin: true,
+    })
+
+    res.status(201).send({
+      message: "Admin created successfully",
+      admin: newAdmin,
+    })
   } catch (error) {
-    console.error("Internal Error:", error);
-    res.status(500).send("Server Error: " + error.message);
+    console.log(error)
+
+    res.status(500).send({
+      message: "Server Error",
+      error: error.message,
+    })
   }
 }
 
@@ -143,5 +165,6 @@ module.exports = {
   signIn,
   checkSession,
   getUserById,
-  updatePassword
+  updatePassword,
+  createAdmin,
 }
