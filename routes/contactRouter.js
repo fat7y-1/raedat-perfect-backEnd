@@ -20,4 +20,11 @@ router.delete(
   contactController.deleteMessage
 )
 
+router.put(
+  "/read/:id",
+  middleware.stripToken,
+  middleware.verifyToken,
+  contactController.toggleReadMessage
+)
+
 module.exports = router

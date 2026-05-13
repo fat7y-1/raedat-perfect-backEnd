@@ -39,9 +39,31 @@ const deleteMessage = async (req, res) => {
     res.status(500).send(`error: ${error}`)
   }
 }
+const toggleReadMessage = async (req, res) => {
+  try {
+    const updatedMessage = await ContactMessage.findByIdAndUpdate(
+      req.params.id,
+      {
+        isRead: req.body.isRead,
+      },
+      { new: true }
+    )
+
+    if (!updatedMessage) {
+      return res.status(404).send({
+        message: "Message not found",
+      })
+    }
+
+    res.status(200).json(updatedMessage)
+  } catch (error) {
+    res.status(500).send(`error: ${error}`)
+  }
+}
 
 module.exports = {
   sendMessage,
   getMessages,
   deleteMessage,
+  toggleReadMessage,
 }

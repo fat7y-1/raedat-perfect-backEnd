@@ -11,6 +11,11 @@ const ContactMessageSchema = new mongoose.Schema(
     subject: { type: String, required: true },
 
     message: { type: String, required: true },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+
   },
   { timestamps: true }
 )
